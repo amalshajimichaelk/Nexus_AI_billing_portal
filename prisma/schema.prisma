@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Organization {
+  id             String          @id @default(uuid())
+  name           String
+  plan           String          @default("Starter") // Starter, Team, Enterprise Pro
+  billingCycle   String          @default("monthly")
+  users          User[]
+  apiKeys        ApiKey[]
+  auditEvents    AuditEvent[]
+  invoices       Invoice[]
+  dailyUsages    DailyUsage[]
+  endpointUsages EndpointUsage[]
+}
+
+model User {
+  id             String       @id @default(uuid())
+  name           String
+  email          String       @unique
+  role           String       @default("Viewer")
+  status         String       @default("pending")
+  avatar         String
+  lastActive     String       @default("Never")
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model ApiKey {
+  id             String       @id @default(uuid())
+  name           String
+  keyString      String       @unique
+  status         String       @default("active")
+  requests       Int          @default(0)
+  lastUsedAt     String       @default("Never")
+  createdAt      DateTime     @default(now())
+  permissions    String       
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model AuditEvent {
+  id             String       @id @default(uuid())
+  user           String
+  avatar         String
+  action         String
+  type           String       
+  details        String
+  ipAddress      String
+  timestamp      DateTime     @default(now())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Invoice {
+  id             String       @id @default(uuid())
+  amount         Float
+  status         String       // paid, pending, failed
+  date           String
+  invoiceNumber  String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model DailyUsage {
+  id             String       @id @default(uuid())
+  date           String
+  tokens         Int
+  queries        Int
+  errors         Int
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model EndpointUsage {
+  id             String       @id @default(uuid())
+  endpoint       String
+  requests       Int
+  errorRate      Float
+  p95Latency     String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
