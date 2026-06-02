@@ -4,10 +4,14 @@ import fs from 'fs'
 
 const prismaClientSingleton = () => {
   if (process.env.NODE_ENV === 'production') {
-    const dbPath = path.join(process.cwd(), 'public', 'dev.db')
+    const dbPath = path.join(process.cwd(), 'prisma', 'dev.db')
     const tmpPath = '/tmp/dev.db'
     if (fs.existsSync(dbPath) && !fs.existsSync(tmpPath)) {
-      fs.copyFileSync(dbPath, tmpPath)
+      try {
+        fs.copyFileSync(dbPath, tmpPath)
+      } catch (e) {
+        console.error('Failed to copy DB', e)
+      }
     }
     return new PrismaClient({
       datasources: {
