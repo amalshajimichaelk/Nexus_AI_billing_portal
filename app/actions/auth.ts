@@ -12,12 +12,14 @@ export async function getAllUsers() {
 }
 
 export async function loginAs(userId: string) {
-  cookies().set(COOKIE_NAME, userId, { path: '/' })
+  const cookieStore = await cookies();
+  cookieStore.set(COOKIE_NAME, userId, { path: '/' })
   return { success: true }
 }
 
 export async function getCurrentUser() {
-  const userId = cookies().get(COOKIE_NAME)?.value
+  const cookieStore = await cookies();
+  const userId = cookieStore.get(COOKIE_NAME)?.value
 
   if (userId) {
     const user = await prisma.user.findUnique({ where: { id: userId } })
@@ -31,7 +33,8 @@ export async function getCurrentUser() {
   
   if (fallbackUser && !userId) {
     // Automatically log them in as owner
-    cookies().set(COOKIE_NAME, fallbackUser.id, { path: '/' })
+    const cookieStore = await cookies();
+    cookieStore.set(COOKIE_NAME, fallbackUser.id, { path: '/' })
   }
 
   return fallbackUser
