@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getAuditLogs } from "../actions/audit";
 import AuditLogsClient from "./client";
 

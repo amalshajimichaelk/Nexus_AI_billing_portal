@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getAnalytics } from "../actions/analytics";
 import AnalyticsClient from "./client";
 

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getBillingDetails } from "../actions/billing";
 import InvoicesClient from "./client";
 

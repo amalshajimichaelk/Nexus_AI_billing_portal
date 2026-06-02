@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getApiKeys } from "../actions/api-keys";
 import ApiKeysClient from "./client";
 
