@@ -121,7 +121,7 @@ export default function AnalyticsClient({ data }: { data: any }) {
           <p className="text-sm text-slate-400 dark:text-slate-500 mb-4">Tokens consumed per day</p>
           <div className="h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={filteredDailyUsages} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <BarChart key={period} data={filteredDailyUsages} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} />
                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#94a3b8" }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#94a3b8" }} tickFormatter={(v) => `${(v).toFixed(1)}M`} />
