@@ -3,24 +3,42 @@ import path from 'path'
 import fs from 'fs'
 
 const prismaClientSingleton = () => {
-  if (process.env.NODE_ENV === 'production') {
-    const dbPath = path.join(process.cwd(), 'prisma', 'dev.db')
-    const tmpPath = '/tmp/dev.db'
-    if (fs.existsSync(dbPath) && !fs.existsSync(tmpPath)) {
-      try {
-        fs.copyFileSync(dbPath, tmpPath)
-      } catch (e) {
-        console.error('Failed to copy DB', e)
+  // On Vercel (production), the filesystem is read-only except /tmp.
+  // We must copy the SQLite database to /tmp so Prisma can create journal files.
+  if (process.env.VERCEL) {
+    const tmpDbPath = '/tmp/dev.db'
+    
+    // Only copy if not already there (avoids re-copying on warm starts)
+    if (!fs.existsSync(tmpDbPath)) {
+      // Try multiple possible source locations
+      const possibleSources = [
+        path.join(process.cwd(), 'prisma', 'dev.db'),
+        path.join(__dirname, '..', 'prisma', 'dev.db'),
+        path.resolve('prisma', 'dev.db'),
+      ]
+      
+      for (const src of possibleSources) {
+        try {
+          if (fs.existsSync(src)) {
+            fs.copyFileSync(src, tmpDbPath)
+            console.log(`Copied database from ${src} to ${tmpDbPath}`)
+            break
+          }
+        } catch (e) {
+          console.error(`Failed to copy from ${src}:`, e)
+        }
       }
     }
+    
     return new PrismaClient({
       datasources: {
         db: {
-          url: `file:${tmpPath}`,
+          url: `file:${tmpDbPath}`,
         },
       },
     })
   }
+  
   return new PrismaClient()
 }
 
