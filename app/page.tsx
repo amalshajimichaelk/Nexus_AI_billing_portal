@@ -10,9 +10,13 @@ export default async function DashboardPage() {
     return <div>Loading...</div>;
   }
 
-  const dailyUsages = await prisma.dailyUsage.findMany({
-    where: { organizationId: org.id },
-    orderBy: { id: 'asc' }
+  let dailyUsages = await prisma.dailyUsage.findMany({
+    where: { organizationId: org.id }
+  });
+
+  // Sort them chronologically (dates are stored as "Jun 2", so we append a year for parsing)
+  dailyUsages.sort((a, b) => {
+    return new Date(`${a.date} 2026`).getTime() - new Date(`${b.date} 2026`).getTime();
   });
 
   const apiKeys = await prisma.apiKey.findMany({

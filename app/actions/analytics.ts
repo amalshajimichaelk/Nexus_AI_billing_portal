@@ -6,10 +6,14 @@ export async function getAnalytics() {
   const org = await prisma.organization.findFirst()
   if (!org) return { dailyUsages: [], endpointUsages: [] }
 
-  const dailyUsages = await prisma.dailyUsage.findMany({
-    where: { organizationId: org.id },
-    orderBy: { id: 'asc' } // In real world order by date
+  let dailyUsages = await prisma.dailyUsage.findMany({
+    where: { organizationId: org.id }
   })
+
+  // Sort them chronologically
+  dailyUsages.sort((a, b) => {
+    return new Date(`${a.date} 2026`).getTime() - new Date(`${b.date} 2026`).getTime();
+  });
 
   const endpointUsages = await prisma.endpointUsage.findMany({
     where: { organizationId: org.id },
