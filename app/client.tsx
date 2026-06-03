@@ -49,6 +49,11 @@ export default function DashboardClient({
   const [timeRange, setTimeRange] = useState<"month" | "previous">("month");
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
 
+  // Split usage data: last 30 entries = "This Month", previous 30 = "Previous"
+  const thisMonthData = dailyUsages.slice(-30);
+  const previousMonthData = dailyUsages.slice(-60, -30);
+  const chartData = timeRange === "month" ? thisMonthData : previousMonthData;
+
   const handleCopyKey = (id: string, key: string) => {
     navigator.clipboard.writeText(key);
     setCopiedKeyId(id);
@@ -116,7 +121,7 @@ export default function DashboardClient({
           </div>
           <div className="flex-1 min-h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={dailyUsages} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="tokenGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
